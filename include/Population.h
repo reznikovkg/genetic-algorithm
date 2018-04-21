@@ -1,3 +1,10 @@
+/*
+	Author: reznikovkg
+	GitHub: https://github.com/reznikovkg
+	Email: kosrez1@yandex.ru
+	GitHub Repository: https://github.com/reznikovkg/genetic-algorithm
+*/
+
 #include <iostream>
 
 using namespace std;
@@ -16,64 +23,48 @@ public:
 		num = num_individ;
 		Individs = new Individ[num];
 	}
+	/*
+	 * Геттеры
+	 */
 
-	void print()
-	{
-		cout << "Print population (all individs): \n";
-		for (int i = 0; i < num; i++) {
-			cout << Individs[i].getId() <<")\t";
-			Individs[i].print();
-		}
-		cout << "\n";
-	}
-	
-	void setPopulation(int min, int max)
-	{
-		for (int i = 0; i < num; i++) {
-			Individs[i] = Individ(i);
-			Individs[i].setRand(min, max);
-		}
-	}
 
 	Individ getIndivid(int k)
 	{
 		return Individs[k];
 	}
 
-	signed long getSumHeart(int f(int, int, int, int))
+	/*
+	 * Сеттеры
+	 */
+	void setHeart(signed int max)
 	{
-		signed long out = 0;
-
 		for (int i = 0; i < num; i++) {
-			out += Individs[i].getHeart();
+			Individs[i].setHeart(max);
 		}
-
-		return out;
 	}
 
-	signed long getMaxFitness(int f(int, int, int, int))
+	void setIndivid(Individ Ind, int num_Ind)
 	{
-		signed long out = 0;
-
-		for (int i = 0; i < num; i++) {
-			signed long now = abs(Individs[i].getFintess(f));
-			if (now > out) {
-				out = now;
-			}
-		}
-
-		return out;
-	}
-
-
-	void setInverseFitness(signed int max)
-	{
-		for (int i = 0; i < num; i++) {
-			Individs[i].setInverseForFintess(max);
-		}
+		Individs[num_Ind] = Ind;
 	}
 	
-	Individ getIndividByHeart(signed int value)
+	void setPopulation(int min, int max, int num_Individ)
+	{
+		for (int i = 0; i < num; i++) {
+			Individs[i] = Individ(i, num_Individ);
+			Individs[i].setRand(min, max);
+		}
+	}
+
+	
+	
+	
+
+	/*
+	 * Спец. Геттеры
+	 */
+	//Получить особь с вероятностью из популяции
+	Individ getIndividByHeart(signed int value)  
 	{
 		signed int sum = 0;
 		int out = 0;
@@ -87,5 +78,65 @@ public:
 		return Individs[out];
 	}
 
+	//Получить всю мощьность популяции
+	signed long getSumHeart()
+	{
+		signed long out = 0;
+
+		for (int i = 0; i < num; i++) {
+			out += Individs[i].getHeart();
+		}
+
+		return out;
+	}
+
+	//Получить максимальный фитнес у популяции (самое плохое решение)
+	signed long getMaxFitness(signed int f(int, int*), int numDioph)
+	{
+		signed long out = 0;
+
+		for (int i = 0; i < num; i++) {
+			signed long now = Individs[i].setFintess(f, numDioph);
+			if (now > out) {
+				out = now;
+			}
+		}
+
+		return out;
+	}
+
+	signed long getMinFitness(signed int f(int, int*), int numDioph)
+	{
+		signed long out = getMaxFitness(f, numDioph);
+		for (int i = 0; i < num; i++) {
+			signed long now = Individs[i].setFintess(f, numDioph);
+			if (now < out) {
+				out = now;
+			}
+		}
+
+		return out;
+	}
+
+
+	void print()
+	{
+		cout << "Print population (all individs): \n";
+		for (int i = 0; i < num; i++) {
+			cout << Individs[i].getId() << ")\t";
+			Individs[i].print();
+		}
+		cout << "\n";
+	}
+
+	void printByDownFitness(int maxFit)
+	{
+		for (int i = 0; i < num; i++) {
+			if (Individs[i].getFit() < maxFit) {
+				cout << "\t";
+				Individs[i].print();
+			}
+		}
+	}
 	~Population() {};
 };
